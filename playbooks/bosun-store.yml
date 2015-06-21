@@ -1,0 +1,7 @@
+---
+- hosts: zookeeper
+  tasks:
+    - name: install OpenTSDB
+      yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.1.0/opentsdb-2.1.0.noarch.rpm state=present
+    - name: OpenTSDB create tables script
+      copy: src=../files/create_opentsdb_tables.sh dest=/root mode=0755

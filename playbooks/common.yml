@@ -1,0 +1,15 @@
+---
+- hosts: all
+  tasks:
+    - name: install ambari repo
+      get_url: url=http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.0.1/ambari.repo dest=/etc/yum.repos.d/ambari.repo
+    - name: install ambari-agent
+      yum: name=ambari-agent state=present
+    - name: Build hosts file
+      lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present
+      when: hostvars[item].ansible_default_ipv4.address is defined
+      with_items: groups['all']
+    - name: install ntp
+      yum: name=ntp state=present
+    - name: enable and run ntpd
+      service: name=ntpd state=started enabled=yes

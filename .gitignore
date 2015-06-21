@@ -1,0 +1,4 @@
+inventory
+hosts
+terraform.tfstate*
+files/id_rsa*

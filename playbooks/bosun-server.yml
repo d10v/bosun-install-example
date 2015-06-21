@@ -1,0 +1,31 @@
+---
+- hosts: bosun-server
+  tasks:
+    - name: install Java
+      yum: name=java-1.8.0-openjdk-headless state=present
+    - name: install OpenTSDB
+      yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.1.0/opentsdb-2.1.0.noarch.rpm state=present
+    - name: generate opentsdb.conf
+      template: src=../templates/opentsdb.conf.j2 dest=/etc/opentsdb/opentsdb.conf
+    - name: install Bosun binary
+      get_url: url=https://github.com/bosun-monitor/bosun/releases/download/0.2.0/bosun-linux-amd64 dest=/usr/local/bin/bosun mode=0755
+    - name: create Bosun config dir
+      file: name=/etc/bosun state=directory
+    - name: install Bosun config
+      copy: src=../files/bosun.conf dest=/etc/bosun/bosun.conf
+    - name: install PackageCloud repo
+      get_url: url=https://packagecloud.io/install/repositories/imeyer/runit/config_file.repo?os=el&dist=5 dest=/etc/yum.repos.d/runit.repo
+    - name: disable PackageCloud GPG check
+      replace: "dest=/etc/yum.repos.d/runit.repo regexp='^repo_gpgcheck=1' replace='repo_gpgcheck=0'"
+    - name: accept PackageCloud GPG key
+      rpm_key: state=present key=https://packagecloud.io/gpg.key
+    - name: install Runit
+      yum: name=runit state=present
+    - name: create Bosun service dir
+      file: name=/etc/service/bosun state=directory
+    - name: create Bosun log dir
+      file: name=/etc/service/bosun/log state=directory
+    - name: create Bosun init script
+      copy: src=../files/bosun-run dest=/etc/service/bosun/run mode=0755
+    - name: create Bosun log init script
+      copy: src=../files/runit-log-run dest=/etc/service/bosun/log/run mode=0755

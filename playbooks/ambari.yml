@@ -1,0 +1,5 @@
+---
+- hosts: ambari
+  tasks:
+    - name: install ambari-server
+      yum: name=ambari-server state=present
